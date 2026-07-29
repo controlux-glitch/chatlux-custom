@@ -18,6 +18,89 @@ import {
 import { setCookieWithDomain } from '../sdk/cookieHelpers';
 import { SDK_SET_BUBBLE_VISIBILITY } from 'shared/constants/sharedFrameEvents';
 
+const CONTACT_ADDITIONAL_ATTRIBUTE_KEYS = [
+  'company_name',
+  'city',
+  'country_code',
+  'description',
+  'social_profiles',
+];
+
+const CONTACT_USER_KEYS = [
+  'identifier_hash',
+  'email',
+  'name',
+  'avatar_url',
+  'phone_number',
+  ...CONTACT_ADDITIONAL_ATTRIBUTE_KEYS,
+];
+
+const normalizeObject = value =>
+  value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+
+const buildInitialUserPayload = (userSettings, initialCustomAttributes = {}) => {
+  const normalizedUserSettings = normalizeObject(userSettings);
+  if (!Object.keys(normalizedUserSettings).length) {
+    return null;
+  }
+
+  const {
+    identifier,
+    custom_attributes: nestedCustomAttributes,
+    additional_attributes: nestedAdditionalAttributes,
+    ...restUserSettings
+  } = normalizedUserSettings;
+
+  const user = {};
+
+  CONTACT_USER_KEYS.forEach(key => {
+    if (restUserSettings[key] !== undefined) {
+      user[key] = restUserSettings[key];
+    }
+  });
+
+  const extraCustomAttributes = Object.keys(restUserSettings).reduce(
+    (acc, key) => {
+      if (CONTACT_USER_KEYS.includes(key)) {
+        return acc;
+      }
+
+      acc[key] = restUserSettings[key];
+      return acc;
+    },
+    {}
+  );
+
+  const additionalAttributes = {
+    ...normalizeObject(nestedAdditionalAttributes),
+  };
+
+  CONTACT_ADDITIONAL_ATTRIBUTE_KEYS.forEach(key => {
+    if (user[key] !== undefined) {
+      additionalAttributes[key] = user[key];
+    }
+  });
+
+  const customAttributes = {
+    ...normalizeObject(nestedCustomAttributes),
+    ...extraCustomAttributes,
+    ...normalizeObject(initialCustomAttributes),
+  };
+
+  if (Object.keys(additionalAttributes).length) {
+    user.additional_attributes = additionalAttributes;
+  }
+
+  if (Object.keys(customAttributes).length) {
+    user.custom_attributes = customAttributes;
+  }
+
+  return {
+    identifier,
+    user,
+  };
+};
+
 const runSDK = ({ baseUrl, websiteToken }) => {
   if (window.$chatwoot) {
     return;
@@ -48,6 +131,16 @@ const runSDK = ({ baseUrl, websiteToken }) => {
   );
 
   const chatwootSettings = window.chatwootSettings || {};
+  const initialCustomAttributes = normalizeObject(
+    chatwootSettings.customAttributes
+  );
+  const initialUserPayload = buildInitialUserPayload(
+    chatwootSettings.user || chatwootSettings.contact,
+    initialCustomAttributes
+  );
+  const initialConversationCustomAttributes = normalizeObject(
+    chatwootSettings.conversationCustomAttributes
+  );
   let locale = chatwootSettings.locale;
   let baseDomain = chatwootSettings.baseDomain;
 
@@ -79,6 +172,9 @@ const runSDK = ({ baseUrl, websiteToken }) => {
     enableFileUpload: chatwootSettings.enableFileUpload,
     enableEmojiPicker: chatwootSettings.enableEmojiPicker ?? true,
     enableEndConversation: chatwootSettings.enableEndConversation ?? true,
+    user: initialUserPayload,
+    customAttributes: initialUserPayload ? {} : initialCustomAttributes,
+    conversationCustomAttributes: initialConversationCustomAttributes,
 
     toggle(state) {
       IFrameHelper.events.toggleBubble(state);

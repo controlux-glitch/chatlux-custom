@@ -183,6 +183,20 @@ export const IFrameHelper = {
         IFrameHelper.sendMessage('set-user', window.$chatwoot.user);
       }
 
+      if (Object.keys(window.$chatwoot.customAttributes || {}).length) {
+        IFrameHelper.sendMessage('set-custom-attributes', {
+          customAttributes: window.$chatwoot.customAttributes,
+        });
+      }
+
+      if (
+        Object.keys(window.$chatwoot.conversationCustomAttributes || {}).length
+      ) {
+        IFrameHelper.sendMessage('set-conversation-custom-attributes', {
+          customAttributes: window.$chatwoot.conversationCustomAttributes,
+        });
+      }
+
       window.playAudioAlert = () => {};
 
       initOnEvents.forEach(e => {

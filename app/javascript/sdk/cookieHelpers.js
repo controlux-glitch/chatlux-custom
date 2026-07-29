@@ -1,8 +1,13 @@
 import md5 from 'md5';
 import Cookies from 'js-cookie';
 
-const REQUIRED_USER_KEYS = ['avatar_url', 'email', 'name'];
-const ALLOWED_USER_ATTRIBUTES = [...REQUIRED_USER_KEYS, 'identifier_hash'];
+const REQUIRED_USER_KEYS = ['avatar_url', 'email', 'name', 'phone_number'];
+const ALLOWED_USER_ATTRIBUTES = [
+  ...REQUIRED_USER_KEYS,
+  'identifier_hash',
+  'additional_attributes',
+  'custom_attributes',
+];
 
 export const getUserCookieName = () => {
   const SET_USER_COOKIE_PREFIX = 'cw_user_';
@@ -10,9 +15,17 @@ export const getUserCookieName = () => {
   return `${SET_USER_COOKIE_PREFIX}${websiteIdentifier}`;
 };
 
+const serializeUserAttribute = value => {
+  if (value === undefined || value === null) {
+    return '';
+  }
+
+  return typeof value === 'object' ? JSON.stringify(value) : value;
+};
+
 export const getUserString = ({ identifier = '', user }) => {
   const userStringWithSortedKeys = ALLOWED_USER_ATTRIBUTES.reduce(
-    (acc, key) => `${acc}${key}${user[key] || ''}`,
+    (acc, key) => `${acc}${key}${serializeUserAttribute(user[key])}`,
     ''
   );
   return `${userStringWithSortedKeys}identifier${identifier}`;

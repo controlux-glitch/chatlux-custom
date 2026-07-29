@@ -24,6 +24,23 @@ window.chatwootSettings = {
   // showPopoutButton: true,
   widgetStyle: '<%= @widget_style %>',
   darkMode: '<%= @dark_mode %>',
+  user: {
+    identifier: 'station-98765',
+    name: 'Jane Doe',
+    email: 'jane@example.com',
+    phone_number: '+5215555555555',
+    station_id: 98765,
+    profile: 'supervisor',
+    branch: 'Centro',
+  },
+  customAttributes: {
+    source: 'widget_test_page',
+    tenant: 'controlux',
+  },
+  conversationCustomAttributes: {
+    topic: 'support',
+    requested_from: 'widget-test',
+  },
 };
 
 (function(d,t) {
