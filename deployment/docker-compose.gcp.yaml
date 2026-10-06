@@ -1,0 +1,86 @@
+name: chatlux
+
+x-app: &app
+  image: ${CHATLUX_IMAGE:?Set CHATLUX_IMAGE to the built release image}
+  env_file: /opt/chatlux/.env
+  environment: &app-env
+    RAILS_ENV: production
+    NODE_ENV: production
+    INSTALLATION_ENV: docker
+    FRONTEND_URL: https://chatwoot.controlux.com.mx
+    FORCE_SSL: 'true'
+    ENABLE_ACCOUNT_SIGNUP: 'false'
+    POSTGRES_HOST: postgres
+    POSTGRES_DATABASE: chatwoot_production
+    POSTGRES_USERNAME: postgres
+    REDIS_URL: redis://redis:6379
+    ACTIVE_STORAGE_SERVICE: local
+    RAILS_LOG_TO_STDOUT: 'true'
+    RAILS_MAX_THREADS: '3'
+    WEB_CONCURRENCY: '1'
+    SIDEKIQ_CONCURRENCY: '5'
+  volumes:
+    - storage_data:/app/storage
+  restart: unless-stopped
+  logging: &logging
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+services:
+  rails:
+    <<: *app
+    entrypoint: docker/entrypoints/rails.sh
+    command: ['bundle', 'exec', 'rails', 's', '-p', '3000', '-b', '0.0.0.0']
+    ports:
+      - '10.206.0.9:3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  sidekiq:
+    <<: *app
+    command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: chatwoot_production
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d chatwoot_production']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    logging: *logging
+
+  redis:
+    image: redis:7-alpine
+    env_file: /opt/chatlux/.env
+    command: ['sh', '-c', 'exec redis-server --appendonly yes --requirepass "$$REDIS_PASSWORD"']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  storage_data:
+  postgres_data:
+  redis_data:
