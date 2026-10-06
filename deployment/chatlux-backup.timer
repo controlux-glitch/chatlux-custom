@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily Chatlux backup at 02:15 Mexico City time
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 America/Mexico_City
+Persistent=true
+
+[Install]
+WantedBy=timers.target

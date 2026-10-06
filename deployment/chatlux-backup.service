@@ -1,0 +1,10 @@
+[Unit]
+Description=Back up Chatlux database, attachments and configuration
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/chatlux/backup-chatlux.sh
+User=root
+UMask=0077

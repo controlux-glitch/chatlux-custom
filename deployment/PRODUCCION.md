@@ -58,6 +58,10 @@ superadministrador. El registro público queda desactivado.
 `/opt/chatlux/backups/`, accesible solamente por root. El respaldo contiene
 secretos. No subirlo a Git ni compartirlo.
 
+`chatlux-backup.timer` programa el respaldo a las 02:15 de Ciudad de México.
+Comprobarlo con `sudo systemctl list-timers chatlux-backup.timer` y ejecutar un
+respaldo manual con `sudo systemctl start chatlux-backup.service`.
+
 Los respaldos locales no protegen frente a la pérdida del disco o de la VM.
 Configurar almacenamiento externo y retención antes de depender de la instancia
 para datos críticos. Vigilar el espacio disponible mientras no haya retención.
