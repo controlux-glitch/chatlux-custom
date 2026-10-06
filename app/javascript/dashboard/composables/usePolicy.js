@@ -6,7 +6,7 @@ import {
   getUserPermissions,
   hasPermissions,
 } from 'dashboard/helper/permissionsHelper';
-import { PREMIUM_FEATURES } from 'dashboard/featureFlags';
+import { FEATURE_FLAGS, PREMIUM_FEATURES } from 'dashboard/featureFlags';
 
 import { INSTALLATION_TYPES } from 'dashboard/constants/installationTypes';
 
@@ -107,6 +107,14 @@ export function usePolicy() {
   const shouldShowPaywall = featureFlag => {
     const flag = unref(featureFlag);
     if (!flag) return false;
+
+    if (
+      flag === FEATURE_FLAGS.CAPTAIN &&
+      !isOnChatwootCloud.value &&
+      isFeatureFlagEnabled(flag)
+    ) {
+      return false;
+    }
 
     if (isACustomBrandedInstance.value) {
       // custom branded instances never show paywall
