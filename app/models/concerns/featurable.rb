@@ -9,6 +9,8 @@ module Featurable
   FEATURE_LIST = YAML.safe_load(Rails.root.join('config/features.yml').read).freeze
 
   FEATURES = FEATURE_LIST.each_with_object({}) do |feature, result|
+    next if feature['name'] == 'flows'
+
     result[result.keys.size + 1] = "feature_#{feature['name']}".to_sym
   end
 
@@ -43,6 +45,15 @@ module Featurable
 
   def feature_enabled?(name)
     send("feature_#{name}?")
+  end
+
+  # Flows exceeds the 63 positive bits available in the bigint feature mask.
+  def feature_flows?
+    internal_attributes['feature_flows'] == true
+  end
+
+  def feature_flows=(enabled)
+    self.internal_attributes = internal_attributes.merge('feature_flows' => enabled)
   end
 
   def all_features
