@@ -3,7 +3,7 @@
 # calls through this interface — it never lets the AI execute SQL/HTTP/
 # arbitrary code directly; any follow-up action goes through its own
 # authorized node handler.
-class FlowEngine::AIProvider::Base
+class FlowEngine::AiProvider::Base
   def classify_intent(_text, options: [])
     raise NotImplementedError
   end
