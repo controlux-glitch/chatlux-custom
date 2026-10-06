@@ -1,15 +1,17 @@
 FROM chatwoot/chatwoot@sha256:069a8bd3a1ffc2f5c8c85142383cef62d9af6d49eaa2b06002934ddd03f55dae AS builder
 
 WORKDIR /release
+ARG NODE_OPTIONS=--max-old-space-size=4096
 ENV EXECJS_RUNTIME=Node
-ENV NODE_OPTIONS=--max-old-space-size=2048
+ENV NODE_OPTIONS=${NODE_OPTIONS}
 
-COPY . /release
+COPY Gemfile Gemfile.lock package.json pnpm-lock.yaml /release/
 
 # Reuse the official gems only while the dependency lock matches exactly.
 RUN cmp Gemfile.lock /app/Gemfile.lock && bundle check
 RUN node /usr/local/lib/node_modules/npm/bin/npm-cli.js install -g pnpm@10.2.0 \
   && pnpm install --frozen-lockfile --prod=false
+COPY . /release
 RUN SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=true bundle exec rake assets:precompile \
   && git rev-parse HEAD > .git_sha \
   && rm -rf node_modules .git tmp/cache
