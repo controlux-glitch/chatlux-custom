@@ -32,6 +32,15 @@ sudo docker compose --env-file /opt/chatlux/.env -f /opt/chatlux/docker-compose.
 sudo docker compose --env-file /opt/chatlux/.env -f /opt/chatlux/docker-compose.gcp.yaml logs --tail=100 rails sidekiq
 ```
 
+El correo usa Brevo (`smtp-relay.brevo.com`, puerto `465`) con TLS implícito:
+`SMTP_SSL=true`, `SMTP_TLS=false`, `SMTP_ENABLE_STARTTLS_AUTO=false` y
+`SMTP_AUTHENTICATION=login`. El remitente es `chatwoot@controlux.com.mx`.
+Las credenciales están únicamente en `.env`. Recrear Rails y Sidekiq con
+`docker compose up -d rails sidekiq` tras modificar las variables de correo.
+
+El nodo `AI` de los flujos aún no tiene implementación de proveedor y devuelve
+un error explícito si se ejecuta.
+
 ## Cambio manual en Nginx del proxy
 
 Solo modificar el bloque correspondiente a `chatwoot.controlux.com.mx`.
