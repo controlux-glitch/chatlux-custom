@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_11_184600) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_18_000004) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -844,6 +844,76 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_11_184600) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["name", "account_id"], name: "index_email_templates_on_name_and_account_id", unique: true
+  end
+
+  create_table "flow_definition_inboxes", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "flow_definition_id", null: false
+    t.bigint "inbox_id", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_flow_definition_inboxes_on_account_id"
+    t.index ["flow_definition_id", "inbox_id"], name: "index_flow_def_inboxes_on_flow_definition_and_inbox", unique: true
+    t.index ["inbox_id"], name: "index_flow_definition_inboxes_on_inbox_id"
+  end
+
+  create_table "flow_definitions", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "created_by_id"
+    t.bigint "updated_by_id"
+    t.string "name", null: false
+    t.text "description"
+    t.integer "status", default: 0, null: false
+    t.jsonb "definition", default: {"edges" => [], "nodes" => []}, null: false
+    t.jsonb "published_definition"
+    t.integer "version", default: 0, null: false
+    t.datetime "published_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_flow_definitions_on_account_id_and_status"
+    t.index ["account_id"], name: "index_flow_definitions_on_account_id"
+  end
+
+  create_table "flow_run_events", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "flow_run_id", null: false
+    t.string "node_id", null: false
+    t.string "node_type", null: false
+    t.jsonb "input", default: {}, null: false
+    t.jsonb "output", default: {}, null: false
+    t.integer "status", null: false
+    t.text "error_message"
+    t.string "next_node_id"
+    t.integer "duration_ms"
+    t.datetime "created_at", null: false
+    t.index ["account_id"], name: "index_flow_run_events_on_account_id"
+    t.index ["flow_run_id", "created_at"], name: "index_flow_run_events_on_flow_run_id_and_created_at"
+    t.index ["flow_run_id"], name: "index_flow_run_events_on_flow_run_id"
+  end
+
+  create_table "flow_runs", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "flow_definition_id", null: false
+    t.integer "flow_version", null: false
+    t.bigint "conversation_id", null: false
+    t.bigint "contact_id", null: false
+    t.bigint "inbox_id", null: false
+    t.string "current_node_id"
+    t.integer "status", default: 0, null: false
+    t.jsonb "variables", default: {}, null: false
+    t.jsonb "definition_snapshot", default: {}, null: false
+    t.text "error_message"
+    t.datetime "started_at", null: false
+    t.datetime "finished_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "status"], name: "index_flow_runs_on_account_id_and_status"
+    t.index ["account_id"], name: "index_flow_runs_on_account_id"
+    t.index ["contact_id"], name: "index_flow_runs_on_contact_id"
+    t.index ["conversation_id"], name: "index_flow_runs_on_active_conversation", unique: true, where: "(status = ANY (ARRAY[0, 1]))"
+    t.index ["conversation_id"], name: "index_flow_runs_on_conversation_id"
+    t.index ["flow_definition_id"], name: "index_flow_runs_on_flow_definition_id"
   end
 
   create_table "folders", force: :cascade do |t|

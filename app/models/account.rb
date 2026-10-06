@@ -67,6 +67,10 @@ class Account < ApplicationRecord
   has_many :macros, dependent: :destroy_async
   has_many :campaigns, dependent: :destroy_async
   has_many :canned_responses, dependent: :destroy_async
+  has_many :flow_definitions, dependent: :destroy_async
+  has_many :flow_definition_inboxes, dependent: :destroy_async
+  has_many :flow_runs, dependent: :destroy_async
+  has_many :flow_run_events, dependent: :destroy_async
   has_many :categories, dependent: :destroy_async, class_name: '::Category'
   has_many :contacts, dependent: :destroy_async
   has_many :conversations, dependent: :destroy_async

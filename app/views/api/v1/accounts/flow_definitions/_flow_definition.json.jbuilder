@@ -1,0 +1,11 @@
+json.id flow_definition.id
+json.name flow_definition.name
+json.description flow_definition.description
+json.status flow_definition.status
+json.definition flow_definition.definition
+json.version flow_definition.version
+json.published_at flow_definition.published_at
+json.account_id flow_definition.account_id
+json.created_at flow_definition.created_at
+json.updated_at flow_definition.updated_at
+json.inbox_ids flow_definition.inboxes.pluck(:id)

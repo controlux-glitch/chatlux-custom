@@ -1,0 +1,11 @@
+json.id flow_run.id
+json.flow_definition_id flow_run.flow_definition_id
+json.conversation_id flow_run.conversation_id
+json.contact_id flow_run.contact_id
+json.inbox_id flow_run.inbox_id
+json.current_node_id flow_run.current_node_id
+json.status flow_run.status
+json.variables flow_run.variables
+json.started_at flow_run.started_at
+json.finished_at flow_run.finished_at
+json.error_message flow_run.error_message

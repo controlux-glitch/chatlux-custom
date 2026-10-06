@@ -99,4 +99,9 @@ module Redis::RedisKeys
 
   ## Account Email Rate Limiting
   ACCOUNT_OUTBOUND_EMAIL_COUNT_KEY = 'OUTBOUND_EMAIL_COUNT::%<account_id>d::%<date>s'.freeze
+
+  ## Flow Engine Keys
+  # At-most-one FlowEngine::AdvanceJob per flow_run in-flight, so concurrent
+  # messages/webhooks never execute the same flow node twice.
+  FLOW_RUN_MUTEX = 'FLOW_RUN_MUTEX::%<flow_run_id>d'.freeze
 end

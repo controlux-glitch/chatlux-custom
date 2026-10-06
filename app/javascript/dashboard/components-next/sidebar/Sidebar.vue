@@ -683,6 +683,13 @@ const menuItems = computed(() => {
       ],
     },
     {
+      name: 'Flows',
+      label: t('SIDEBAR.FLOWS'),
+      icon: 'i-lucide-git-branch',
+      to: accountScopedRoute('flows_index'),
+      activeOn: ['flows_index', 'flows_new', 'flows_edit', 'flows_runs'],
+    },
+    {
       name: 'Portals',
       label: t('SIDEBAR.HELP_CENTER.TITLE'),
       icon: 'i-lucide-library-big',

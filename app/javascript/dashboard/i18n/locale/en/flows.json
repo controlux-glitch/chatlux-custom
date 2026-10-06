@@ -1,0 +1,65 @@
+{
+  "FLOWS": {
+    "HEADER": "Flows",
+    "HEADER_BTN_TXT": "Add Flow",
+    "LIST": {
+      "EMPTY": "No flows have been created yet.",
+      "TABLE_HEADER": {
+        "NAME": "Name",
+        "STATUS": "Status",
+        "UPDATED_AT": "Updated at",
+        "ACTIONS": "Actions"
+      },
+      "ACTIONS": {
+        "RUNS": "Runs",
+        "PUBLISH": "Publish",
+        "CLONE": "Clone",
+        "DELETE": "Delete"
+      }
+    },
+    "PUBLISH": {
+      "SUCCESS_MESSAGE": "Flow published successfully",
+      "ERROR_MESSAGE": "Could not publish the flow"
+    },
+    "CLONE": {
+      "SUCCESS_MESSAGE": "Flow duplicated successfully",
+      "ERROR_MESSAGE": "Could not duplicate the flow"
+    },
+    "DELETE": {
+      "SUCCESS_MESSAGE": "Flow deleted successfully",
+      "ERROR_MESSAGE": "Could not delete the flow"
+    },
+    "EDITOR": {
+      "DEFAULT_NAME": "Untitled flow",
+      "NAME_PLACEHOLDER": "Flow name",
+      "NODE_PALETTE": "Nodes",
+      "DELETE_NODE": "Delete node",
+      "ADD_BUTTON": "Add button",
+      "BUTTON_TITLE_PLACEHOLDER": "Button title",
+      "BUTTONS_LIST_WARNING": "More than 3 buttons will be sent as a list.",
+      "INBOXES_LABEL": "Inboxes",
+      "SELECT_TEAM": "Select a team",
+      "SELECT_AGENT": "Select an agent",
+      "SELECT_LABEL": "Select a label",
+      "SAVE": "Save",
+      "SAVING": "Saving…",
+      "PUBLISH": "Publish",
+      "SAVE_SUCCESS": "Flow saved successfully",
+      "SAVE_ERROR": "Could not save the flow"
+    },
+    "RUNS": {
+      "HEADER": "Flow runs",
+      "EMPTY": "This flow has not run yet.",
+      "TABLE_HEADER": {
+        "CONVERSATION": "Conversation",
+        "STATUS": "Status",
+        "CURRENT_NODE": "Current node",
+        "STARTED_AT": "Started at"
+      },
+      "DETAIL": {
+        "TITLE": "Run #{id}",
+        "NEXT_NODE_SUMMARY": "Next node: {nextNode} · {duration}ms"
+      }
+    }
+  }
+}
