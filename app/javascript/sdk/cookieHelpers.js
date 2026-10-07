@@ -11,8 +11,6 @@ const CONTACT_INFORMATION_ATTRIBUTES = [
   'country_code',
   'description',
   'social_profiles',
-  'additional_attributes',
-  'custom_attributes',
 ];
 
 const normalizeUserAttribute = value => {
