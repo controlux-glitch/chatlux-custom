@@ -80,10 +80,14 @@ describe ConversationFinder do
 
     context 'with assignee_type unassigned' do
       let(:params) { { assignee_type: 'unassigned' } }
+      let!(:agent_bot_conversation) do
+        create(:conversation, account: account, inbox: inbox, ai_assignee: create(:agent_bot, account: account))
+      end
 
       it 'filter conversations by assignee type unassigned' do
         result = conversation_finder.perform
         expect(result[:conversations].length).to be 1
+        expect(result[:conversations]).not_to include(agent_bot_conversation)
       end
     end
 
@@ -159,19 +163,23 @@ describe ConversationFinder do
 
     context 'with assignee_type assigned' do
       let(:params) { { assignee_type: 'assigned' } }
+      let!(:agent_bot_conversation) do
+        create(:conversation, account: account, inbox: inbox, ai_assignee: create(:agent_bot, account: account))
+      end
 
       it 'filter conversations by assignee type assigned' do
         result = conversation_finder.perform
-        expect(result[:conversations].length).to be 3
+        expect(result[:conversations].length).to be 4
+        expect(result[:conversations]).to include(agent_bot_conversation)
       end
 
       it 'returns the correct meta' do
         result = conversation_finder.perform
         expect(result[:count]).to eq({
                                        mine_count: 2,
-                                       assigned_count: 3,
+                                       assigned_count: 4,
                                        unassigned_count: 1,
-                                       all_count: 4
+                                       all_count: 5
                                      })
       end
     end
@@ -205,25 +213,6 @@ describe ConversationFinder do
       it 'filter conversations by source id' do
         result = conversation_finder.perform
         expect(result[:conversations].length).to be 1
-      end
-    end
-
-    context 'with participating conversation type' do
-      let(:params) { { status: 'open', conversation_type: 'participating' } }
-
-      it 'does not return participating conversations from inboxes where the agent is no longer a member' do
-        visible_conversation = create(:conversation, account: account, inbox: inbox)
-        inaccessible_conversation = create(:conversation, account: account, inbox: restricted_inbox)
-        create(:inbox_member, user: user_1, inbox: restricted_inbox)
-        create(:conversation_participant, account: account, conversation: visible_conversation, user: user_1)
-        create(:conversation_participant, account: account, conversation: inaccessible_conversation, user: user_1)
-        InboxMember.find_by!(user: user_1, inbox: restricted_inbox).destroy!
-
-        result = conversation_finder.perform
-        conversation_ids = result[:conversations].map(&:id)
-
-        expect(conversation_ids).to include(visible_conversation.id)
-        expect(conversation_ids).not_to include(inaccessible_conversation.id)
       end
     end
 
@@ -307,6 +296,36 @@ describe ConversationFinder do
 
         result = conversation_finder.perform
         expect(result[:conversations].length).to be 2
+      end
+    end
+
+    context 'with participating' do
+      let(:params) { { status: 'open', assignee_type: 'all', conversation_type: 'participating' } }
+
+      it 'excludes participating conversations from inboxes the user no longer has access to' do
+        accessible_conversation = create(:conversation, account: account, inbox: inbox)
+        revoked_conversation = create(:conversation, account: account, inbox: restricted_inbox)
+        revoked_membership = create(:inbox_member, user: user_1, inbox: restricted_inbox)
+        create(:conversation_participant, user: user_1, conversation: accessible_conversation, account: account)
+        create(:conversation_participant, user: user_1, conversation: revoked_conversation, account: account)
+        revoked_membership.destroy!
+
+        result = conversation_finder.perform
+
+        expect(result[:conversations].map(&:id)).to contain_exactly(accessible_conversation.id)
+      end
+
+      it 'excludes the inaccessible conversation from the meta counts too' do
+        accessible_conversation = create(:conversation, account: account, inbox: inbox)
+        revoked_conversation = create(:conversation, account: account, inbox: restricted_inbox)
+        revoked_membership = create(:inbox_member, user: user_1, inbox: restricted_inbox)
+        create(:conversation_participant, user: user_1, conversation: accessible_conversation, account: account)
+        create(:conversation_participant, user: user_1, conversation: revoked_conversation, account: account)
+        revoked_membership.destroy!
+
+        result = conversation_finder.perform_meta_only
+
+        expect(result[:count][:all_count]).to eq 1
       end
     end
   end

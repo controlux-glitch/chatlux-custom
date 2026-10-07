@@ -12,7 +12,7 @@ RSpec.describe Conversations::UnreadCounts::Refresher do
   let(:store) { Conversations::UnreadCounts::Store }
 
   after do
-    store.clear_all_account!(account.id)
+    store.clear_account!(account.id)
   end
 
   it 'does not update redis when unread caches are not ready' do
@@ -154,6 +154,19 @@ RSpec.describe Conversations::UnreadCounts::Refresher do
                                    store.inbox_unassigned_key(account.id, inbox.id) => 0,
                                    store.label_inbox_unassigned_key(account.id, label.id, inbox.id) => 0
                                  )
+  end
+
+  it 'removes assignment-aware unassigned membership when an agent bot is assigned' do
+    conversation = create_unread_conversation(account: account, inbox: inbox)
+    Conversations::UnreadCounts::Builder.new(account).build_assignment!
+    agent_bot = create(:agent_bot, account: account)
+
+    conversation.update!(ai_assignee: agent_bot)
+    result = described_class.new(conversation.reload, changed_attributes: { assignee_agent_bot_id: [nil, agent_bot.id] }).perform
+
+    key = store.inbox_unassigned_key(account.id, inbox.id)
+    expect(result).to be(true)
+    expect(store.counts_for_keys([key])).to eq(key => 0)
   end
 
   it 'moves assignment-aware team membership when team changes' do

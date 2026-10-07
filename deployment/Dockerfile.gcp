@@ -1,4 +1,4 @@
-FROM chatwoot/chatwoot@sha256:069a8bd3a1ffc2f5c8c85142383cef62d9af6d49eaa2b06002934ddd03f55dae AS builder
+FROM chatwoot/chatwoot@sha256:b419dded7e9d2f54a24fd427b74ba7e6069d601b500618045c1eb6c01a1cc9a1 AS builder
 
 WORKDIR /release
 ARG NODE_OPTIONS=--max-old-space-size=4096
@@ -16,7 +16,7 @@ RUN SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=true bundle exec 
   && git rev-parse HEAD > .git_sha \
   && rm -rf node_modules .git tmp/cache
 
-FROM chatwoot/chatwoot@sha256:069a8bd3a1ffc2f5c8c85142383cef62d9af6d49eaa2b06002934ddd03f55dae
+FROM chatwoot/chatwoot@sha256:b419dded7e9d2f54a24fd427b74ba7e6069d601b500618045c1eb6c01a1cc9a1
 
 RUN rm -rf /app
 COPY --from=builder /release /app
