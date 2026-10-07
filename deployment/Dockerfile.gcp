@@ -12,6 +12,7 @@ RUN cmp Gemfile.lock /app/Gemfile.lock && bundle check
 RUN node /usr/local/lib/node_modules/npm/bin/npm-cli.js install -g pnpm@10.2.0 \
   && pnpm install --frozen-lockfile --prod=false
 COPY . /release
+RUN pnpm exec vitest run app/javascript/sdk/specs
 RUN SECRET_KEY_BASE=precompile_placeholder RAILS_LOG_TO_STDOUT=true bundle exec rake assets:precompile \
   && git rev-parse HEAD > .git_sha \
   && rm -rf node_modules .git tmp/cache

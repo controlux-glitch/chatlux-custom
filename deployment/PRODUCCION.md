@@ -14,7 +14,7 @@ de `app-server2`. PostgreSQL y Redis no publican puertos del host.
   `chatlux_storage_data`.
 - VM: 4 GB de RAM y 4 GB de swap persistente en `/swapfile-chatlux`.
 
-`deployment/Dockerfile.gcp` reutiliza la imagen oficial `v4.15.0`, fijada por
+`deployment/Dockerfile.gcp` reutiliza la imagen oficial `v4.18.0`, fijada por
 digest, y compila el código y frontend propios. Comprueba que `Gemfile.lock`
 coincida exactamente antes de reutilizar las gemas. Si cambian las dependencias
 Ruby, actualizar la base o construirlas con `docker/Dockerfile`.

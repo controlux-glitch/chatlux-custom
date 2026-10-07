@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
 const REQUIRED_USER_KEYS = ['avatar_url', 'email', 'name', 'phone_number'];
-const ALLOWED_USER_ATTRIBUTES = [...REQUIRED_USER_KEYS, 'identifier_hash'];
+const ALLOWED_USER_ATTRIBUTES = ['avatar_url', 'email', 'name', 'identifier_hash'];
 const FNV1A_128_OFFSET_BASIS = 0x6c62272e07bb014262b821756295c58dn;
 const FNV1A_128_PRIME = 0x1000000000000000000013bn;
 const CONTACT_INFORMATION_ATTRIBUTES = [
